@@ -1,0 +1,60 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum EventRole {
+  PLANNER
+  ATTENDEE
+}
+
+enum EventStage {
+  DRAFT
+  COLLECTING
+  VOTING
+  CHOOSING
+  UPCOMING
+  PAST
+}
+
+enum TimeSelectionMethod {
+  VOTE
+  DECISION
+}
+
+model User {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId()
+  phone        Int?      @unique
+  email        String?   @unique
+  name         String?
+  tokens       Json?
+}
+
+model Conflict {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId()
+  dayOfWeek   Int?
+  date        String?
+  startTime   String
+  endTime     String
+}
+
+model Event {
+  id                    String              @id @default(auto()) @map("_id") @db.ObjectId()
+  eventStage            EventStage          @default(DRAFT)
+  timeSelectionMethod   TimeSelectionMethod @default(DECISION)
+  locationId            Int?
+  voteOptions           Json?
+}
+
+model Invite {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId()
+  role        EventRole
+  userId      String
+  eventId     String
+  finalized   Boolean  @default(false)
+  votes       Json?
+}
